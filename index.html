@@ -39,14 +39,6 @@ tr:hover td{background:#f9f9f7}
 .badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:600}
 .pos{color:#0F6E56}.neg{color:#993C1D}
 .stars{color:#BA7517;letter-spacing:-1px;font-size:11px}
-.ai-box{background:#fff;border:1px solid #eee;border-radius:12px;padding:1.25rem}
-.ai-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.ai-ttl{font-size:15px;font-weight:600;color:#1a1a1a}
-.ai-btn{padding:6px 14px;font-size:13px;border:1px solid #ddd;border-radius:8px;background:transparent;color:#1a1a1a;cursor:pointer}
-.ai-btn:hover{background:#f1efe8}
-.ai-btn:disabled{opacity:0.5;cursor:not-allowed}
-.ai-out{font-size:13px;color:#1a1a1a;line-height:1.8}
-.ai-ph{color:#888;font-style:italic;font-size:13px}
 .leg{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .leg-i{display:flex;align-items:center;gap:4px;font-size:11px;color:#666}
 .leg-d{width:9px;height:9px;border-radius:2px;flex-shrink:0}
@@ -57,20 +49,41 @@ input[type=range]{accent-color:#1D9E75}
 <body>
 <div class="mfs">
 <h2>Mutual Fund Performance Screener</h2>
-<p class="sub">40 Indian equity &amp; hybrid funds — data as of March 2026 · For informational purposes only</p>
+<p class="sub">230+ Indian equity &amp; hybrid funds across all categories — data as of March 2026 · For informational purposes only</p>
 
 <div class="cards">
-  <div class="card"><div class="card-lbl">Funds in view</div><div class="card-val" id="c-count">40</div><div class="card-sub">of 40 total</div></div>
+  <div class="card"><div class="card-lbl">Funds in view</div><div class="card-val" id="c-count">—</div><div class="card-sub">of 232 total</div></div>
   <div class="card"><div class="card-lbl">Avg 1Y Return</div><div class="card-val" id="c-r1y">—</div><div class="card-sub">selected funds</div></div>
   <div class="card"><div class="card-lbl">Avg Sharpe Ratio</div><div class="card-val" id="c-sharpe">—</div><div class="card-sub">risk-adjusted</div></div>
   <div class="card"><div class="card-lbl">Avg Expense Ratio</div><div class="card-val" id="c-exp">—</div><div class="card-sub">annual cost</div></div>
 </div>
 
 <div class="filters">
-  <div class="fg"><label>Category</label><select id="f-cat"><option value="">All Categories</option><option>Large Cap</option><option>Mid Cap</option><option>Small Cap</option><option>Flexi Cap</option><option>ELSS</option><option>Hybrid</option><option>Index</option><option>Sectoral</option></select></div>
+  <div class="fg"><label>Category</label><select id="f-cat">
+    <option value="">All Categories</option>
+    <option>Large Cap</option>
+    <option>Mid Cap</option>
+    <option>Small Cap</option>
+    <option>Flexi Cap</option>
+    <option>Multi Cap</option>
+    <option>Large &amp; Mid Cap</option>
+    <option>ELSS</option>
+    <option>Hybrid</option>
+    <option>Index</option>
+    <option>Sectoral</option>
+    <option>Value/Contra</option>
+    <option>Focused</option>
+  </select></div>
   <div class="fg"><label>Fund House</label><select id="f-house"><option value="">All Fund Houses</option></select></div>
-  <div class="fg"><label>Sort by</label><select id="f-sort"><option value="r1y">1Y Return ↓</option><option value="r3y">3Y Return ↓</option><option value="r5y">5Y Return ↓</option><option value="sharpe">Sharpe ↓</option><option value="exp">Expense ↑</option><option value="aum">AUM ↓</option></select></div>
-  <div class="fg"><label>Min 1Y Return: <span id="sl1-lbl">0%</span></label><input type="range" id="f-minr" min="0" max="36" value="0" step="1" style="width:120px"></div>
+  <div class="fg"><label>Sort by</label><select id="f-sort">
+    <option value="r1y">1Y Return ↓</option>
+    <option value="r3y">3Y Return ↓</option>
+    <option value="r5y">5Y Return ↓</option>
+    <option value="sharpe">Sharpe ↓</option>
+    <option value="exp">Expense ↑</option>
+    <option value="aum">AUM ↓</option>
+  </select></div>
+  <div class="fg"><label>Min 1Y Return: <span id="sl1-lbl">0%</span></label><input type="range" id="f-minr" min="0" max="40" value="0" step="1" style="width:120px"></div>
   <div class="fg"><label>Max Expense Ratio: <span id="sl2-lbl">2.0%</span></label><input type="range" id="f-maxe" min="0.1" max="2" value="2" step="0.1" style="width:120px"></div>
 </div>
 <div class="rinfo" id="rinfo"></div>
@@ -112,20 +125,13 @@ input[type=range]{accent-color:#1D9E75}
 </table>
 </div>
 
-<div class="ai-box">
-  <div class="ai-hdr">
-    <div class="ai-ttl">AI Fund Analyst</div>
-    <button class="ai-btn" id="ai-btn" onclick="runAI()">Analyse filtered funds</button>
-  </div>
-  <div class="ai-out" id="ai-out"><div class="ai-ph">Apply filters and click "Analyse filtered funds" to get AI-powered insights on your current selection.</div></div>
-</div>
-
 <p class="disc">Disclaimer: For educational/informational purposes only. Past performance does not guarantee future results. Data compiled from public sources including AMFI, Value Research, Groww, and fund factsheets. Please consult a SEBI-registered financial advisor before investing. Not a recommendation.</p>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 const FUNDS=[
+  // === LARGE CAP ===
   {name:"ICICI Pru Bluechip Fund",house:"ICICI Prudential",cat:"Large Cap",aum:45200,exp:0.87,r1y:10.2,r3y:18.5,r5y:21.8,sharpe:1.09,stdDev:14.2,rating:5},
   {name:"SBI Bluechip Fund",house:"SBI",cat:"Large Cap",aum:55637,exp:0.78,r1y:8.5,r3y:15.8,r5y:16.2,sharpe:0.72,stdDev:14.8,rating:3},
   {name:"HDFC Top 100 Fund",house:"HDFC",cat:"Large Cap",aum:45012,exp:0.55,r1y:9.8,r3y:17.2,r5y:17.5,sharpe:0.88,stdDev:15.1,rating:4},
@@ -134,42 +140,312 @@ const FUNDS=[
   {name:"Mirae Asset Large Cap",house:"Mirae Asset",cat:"Large Cap",aum:38500,exp:0.52,r1y:8.9,r3y:16.3,r5y:16.8,sharpe:0.84,stdDev:14.3,rating:4},
   {name:"Nippon India Large Cap",house:"Nippon",cat:"Large Cap",aum:29000,exp:0.85,r1y:11.2,r3y:17.8,r5y:17.1,sharpe:0.91,stdDev:15.2,rating:4},
   {name:"Kotak Bluechip Fund",house:"Kotak",cat:"Large Cap",aum:11200,exp:0.60,r1y:8.4,r3y:15.4,r5y:15.9,sharpe:0.68,stdDev:14.0,rating:3},
-  {name:"Nippon India Mid Cap",house:"Nippon",cat:"Mid Cap",aum:32800,exp:0.85,r1y:14.2,r3y:24.8,r5y:28.4,sharpe:1.12,stdDev:18.5,rating:5},
+  {name:"ABSL Frontline Equity Fund",house:"Aditya Birla SL",cat:"Large Cap",aum:26800,exp:0.96,r1y:8.8,r3y:15.2,r5y:15.8,sharpe:0.70,stdDev:14.5,rating:3},
+  {name:"Franklin India Bluechip Fund",house:"Franklin Templeton",cat:"Large Cap",aum:7200,exp:0.98,r1y:9.5,r3y:16.8,r5y:16.2,sharpe:0.80,stdDev:14.8,rating:3},
+  {name:"DSP Top 100 Equity Fund",house:"DSP",cat:"Large Cap",aum:4500,exp:0.88,r1y:8.1,r3y:14.9,r5y:15.1,sharpe:0.65,stdDev:13.8,rating:3},
+  {name:"Tata Large Cap Fund",house:"Tata",cat:"Large Cap",aum:2800,exp:0.70,r1y:9.0,r3y:15.5,r5y:15.6,sharpe:0.71,stdDev:14.1,rating:3},
+  {name:"Invesco India Largecap Fund",house:"Invesco",cat:"Large Cap",aum:1050,exp:0.65,r1y:9.2,r3y:15.8,r5y:16.0,sharpe:0.74,stdDev:14.4,rating:3},
+  {name:"Baroda BNP Paribas Large Cap",house:"Baroda BNP Paribas",cat:"Large Cap",aum:1650,exp:0.85,r1y:8.7,r3y:15.1,r5y:15.4,sharpe:0.68,stdDev:13.8,rating:3},
+  {name:"Edelweiss Large Cap Fund",house:"Edelweiss",cat:"Large Cap",aum:680,exp:0.62,r1y:8.5,r3y:15.0,r5y:15.2,sharpe:0.69,stdDev:13.9,rating:3},
+  {name:"UTI Mastershare Unit Scheme",house:"UTI",cat:"Large Cap",aum:12500,exp:0.78,r1y:8.1,r3y:14.8,r5y:15.0,sharpe:0.67,stdDev:14.0,rating:3},
+  {name:"LIC MF Large Cap Fund",house:"LIC MF",cat:"Large Cap",aum:1100,exp:0.88,r1y:8.0,r3y:14.5,r5y:14.8,sharpe:0.64,stdDev:14.2,rating:2},
+  {name:"PGIM India Large Cap Fund",house:"PGIM India",cat:"Large Cap",aum:650,exp:0.75,r1y:8.4,r3y:15.2,r5y:15.5,sharpe:0.70,stdDev:14.1,rating:3},
+  {name:"Mahindra Manulife Large Cap",house:"Mahindra Manulife",cat:"Large Cap",aum:480,exp:0.78,r1y:8.3,r3y:14.9,r5y:15.1,sharpe:0.68,stdDev:14.0,rating:3},
+  {name:"WhiteOak Capital Large Cap",house:"WhiteOak Capital",cat:"Large Cap",aum:2200,exp:0.55,r1y:9.8,r3y:17.5,r5y:17.8,sharpe:0.90,stdDev:14.5,rating:4},
+  {name:"Bandhan Large Cap Fund",house:"Bandhan",cat:"Large Cap",aum:1050,exp:0.68,r1y:8.5,r3y:15.2,r5y:15.5,sharpe:0.70,stdDev:14.0,rating:3},
+  {name:"Sundaram Large Cap Fund",house:"Sundaram",cat:"Large Cap",aum:1200,exp:0.88,r1y:8.2,r3y:14.8,r5y:15.0,sharpe:0.66,stdDev:14.1,rating:3},
+  {name:"360 ONE Large Cap Fund",house:"360 ONE",cat:"Large Cap",aum:3200,exp:0.62,r1y:9.5,r3y:17.0,r5y:17.2,sharpe:0.85,stdDev:14.5,rating:4},
+  {name:"JM Large Cap Fund",house:"JM",cat:"Large Cap",aum:950,exp:0.60,r1y:10.5,r3y:18.2,r5y:18.5,sharpe:0.92,stdDev:15.0,rating:4},
+  {name:"Quant Large Cap Fund",house:"Quant",cat:"Large Cap",aum:1800,exp:0.58,r1y:11.5,r3y:19.5,r5y:20.2,sharpe:0.98,stdDev:15.5,rating:4},
+
+  // === MID CAP ===
+  {name:"Nippon India Mid Cap Fund",house:"Nippon",cat:"Mid Cap",aum:32800,exp:0.85,r1y:14.2,r3y:24.8,r5y:28.4,sharpe:1.12,stdDev:18.5,rating:5},
   {name:"HDFC Mid-Cap Opportunities",house:"HDFC",cat:"Mid Cap",aum:72000,exp:0.74,r1y:12.8,r3y:23.1,r5y:26.5,sharpe:1.05,stdDev:17.8,rating:5},
-  {name:"Kotak Emerging Equity",house:"Kotak",cat:"Mid Cap",aum:48000,exp:0.45,r1y:11.9,r3y:21.8,r5y:25.2,sharpe:0.98,stdDev:17.2,rating:4},
+  {name:"Kotak Emerging Equity Fund",house:"Kotak",cat:"Mid Cap",aum:48000,exp:0.45,r1y:11.9,r3y:21.8,r5y:25.2,sharpe:0.98,stdDev:17.2,rating:4},
   {name:"Axis Midcap Fund",house:"Axis",cat:"Mid Cap",aum:24000,exp:0.52,r1y:10.1,r3y:18.9,r5y:22.4,sharpe:0.82,stdDev:16.1,rating:3},
-  {name:"Mirae Asset Midcap",house:"Mirae Asset",cat:"Mid Cap",aum:18500,exp:0.58,r1y:12.4,r3y:22.5,r5y:26.8,sharpe:1.01,stdDev:17.5,rating:4},
-  {name:"Motilal Oswal Midcap",house:"Motilal Oswal",cat:"Mid Cap",aum:22000,exp:0.63,r1y:18.5,r3y:26.2,r5y:28.9,sharpe:1.18,stdDev:19.2,rating:5},
+  {name:"Mirae Asset Midcap Fund",house:"Mirae Asset",cat:"Mid Cap",aum:18500,exp:0.58,r1y:12.4,r3y:22.5,r5y:26.8,sharpe:1.01,stdDev:17.5,rating:4},
+  {name:"Motilal Oswal Midcap Fund",house:"Motilal Oswal",cat:"Mid Cap",aum:22000,exp:0.63,r1y:18.5,r3y:26.2,r5y:28.9,sharpe:1.18,stdDev:19.2,rating:5},
   {name:"Edelweiss Midcap Fund",house:"Edelweiss",cat:"Mid Cap",aum:8500,exp:0.48,r1y:12.2,r3y:22.1,r5y:25.5,sharpe:0.97,stdDev:17.0,rating:4},
-  {name:"Nippon India Small Cap",house:"Nippon",cat:"Small Cap",aum:61000,exp:0.74,r1y:18.8,r3y:30.5,r5y:36.2,sharpe:1.35,stdDev:22.5,rating:5},
+  {name:"DSP Midcap Fund",house:"DSP",cat:"Mid Cap",aum:16500,exp:0.75,r1y:11.5,r3y:20.8,r5y:24.5,sharpe:0.95,stdDev:17.5,rating:4},
+  {name:"Franklin India Prima Fund",house:"Franklin Templeton",cat:"Mid Cap",aum:9800,exp:0.95,r1y:11.8,r3y:21.5,r5y:24.8,sharpe:0.96,stdDev:17.8,rating:4},
+  {name:"ABSL Midcap Fund",house:"Aditya Birla SL",cat:"Mid Cap",aum:5800,exp:0.96,r1y:11.2,r3y:20.5,r5y:23.8,sharpe:0.92,stdDev:17.2,rating:3},
+  {name:"Tata Midcap Growth Fund",house:"Tata",cat:"Mid Cap",aum:3200,exp:0.62,r1y:12.0,r3y:21.8,r5y:25.2,sharpe:0.98,stdDev:17.5,rating:4},
+  {name:"UTI Mid Cap Fund",house:"UTI",cat:"Mid Cap",aum:10200,exp:0.88,r1y:10.5,r3y:19.8,r5y:23.2,sharpe:0.88,stdDev:17.0,rating:3},
+  {name:"Baroda BNP Paribas Mid Cap",house:"Baroda BNP Paribas",cat:"Mid Cap",aum:2800,exp:0.82,r1y:12.5,r3y:22.2,r5y:25.8,sharpe:0.99,stdDev:17.8,rating:4},
+  {name:"Invesco India Midcap Fund",house:"Invesco",cat:"Mid Cap",aum:5200,exp:0.68,r1y:13.5,r3y:23.5,r5y:26.5,sharpe:1.05,stdDev:18.2,rating:4},
+  {name:"Sundaram Mid Cap Fund",house:"Sundaram",cat:"Mid Cap",aum:9800,exp:0.92,r1y:11.8,r3y:21.2,r5y:24.5,sharpe:0.95,stdDev:17.5,rating:4},
+  {name:"PGIM India Midcap Opp Fund",house:"PGIM India",cat:"Mid Cap",aum:10200,exp:0.45,r1y:14.8,r3y:25.5,r5y:28.2,sharpe:1.15,stdDev:19.5,rating:5},
+  {name:"WhiteOak Capital Mid Cap Fund",house:"WhiteOak Capital",cat:"Mid Cap",aum:4500,exp:0.55,r1y:13.8,r3y:24.2,r5y:27.5,sharpe:1.10,stdDev:18.8,rating:4},
+  {name:"Quant Mid Cap Fund",house:"Quant",cat:"Mid Cap",aum:8200,exp:0.60,r1y:16.5,r3y:27.5,r5y:30.2,sharpe:1.20,stdDev:20.5,rating:5},
+  {name:"Mahindra Manulife Mid Cap Fund",house:"Mahindra Manulife",cat:"Mid Cap",aum:2800,exp:0.72,r1y:11.9,r3y:21.5,r5y:24.8,sharpe:0.96,stdDev:17.2,rating:4},
+  {name:"SBI Magnum Midcap Fund",house:"SBI",cat:"Mid Cap",aum:18500,exp:0.92,r1y:10.8,r3y:20.2,r5y:23.5,sharpe:0.90,stdDev:17.0,rating:3},
+  {name:"ICICI Pru Midcap Fund",house:"ICICI Prudential",cat:"Mid Cap",aum:6800,exp:0.92,r1y:12.2,r3y:22.5,r5y:25.8,sharpe:1.00,stdDev:18.0,rating:4},
+  {name:"LIC MF Midcap Fund",house:"LIC MF",cat:"Mid Cap",aum:1050,exp:0.90,r1y:10.2,r3y:19.5,r5y:22.8,sharpe:0.87,stdDev:17.2,rating:3},
+  {name:"360 ONE Mid Cap Fund",house:"360 ONE",cat:"Mid Cap",aum:2200,exp:0.65,r1y:13.0,r3y:23.5,r5y:27.0,sharpe:1.05,stdDev:18.5,rating:4},
+  {name:"Bandhan Midcap Fund",house:"Bandhan",cat:"Mid Cap",aum:1800,exp:0.70,r1y:12.0,r3y:22.0,r5y:25.5,sharpe:0.98,stdDev:17.8,rating:4},
+  {name:"JM Midcap Fund",house:"JM",cat:"Mid Cap",aum:850,exp:0.60,r1y:14.5,r3y:24.5,r5y:27.8,sharpe:1.10,stdDev:19.0,rating:4},
+
+  // === SMALL CAP ===
+  {name:"Nippon India Small Cap Fund",house:"Nippon",cat:"Small Cap",aum:61000,exp:0.74,r1y:18.8,r3y:30.5,r5y:36.2,sharpe:1.35,stdDev:22.5,rating:5},
   {name:"Quant Small Cap Fund",house:"Quant",cat:"Small Cap",aum:24000,exp:0.64,r1y:15.2,r3y:32.1,r5y:38.5,sharpe:1.28,stdDev:24.8,rating:5},
   {name:"HDFC Small Cap Fund",house:"HDFC",cat:"Small Cap",aum:35000,exp:0.62,r1y:14.5,r3y:27.4,r5y:30.8,sharpe:1.18,stdDev:21.2,rating:4},
   {name:"SBI Small Cap Fund",house:"SBI",cat:"Small Cap",aum:30500,exp:0.65,r1y:12.1,r3y:24.8,r5y:29.5,sharpe:1.08,stdDev:20.8,rating:4},
   {name:"Tata Small Cap Fund",house:"Tata",cat:"Small Cap",aum:9800,exp:0.28,r1y:13.2,r3y:24.2,r5y:28.2,sharpe:1.05,stdDev:20.5,rating:4},
   {name:"HSBC Small Cap Fund",house:"HSBC",cat:"Small Cap",aum:15200,exp:0.58,r1y:11.8,r3y:22.9,r5y:27.8,sharpe:0.99,stdDev:21.0,rating:3},
   {name:"DSP Small Cap Fund",house:"DSP",cat:"Small Cap",aum:15800,exp:0.82,r1y:10.2,r3y:21.4,r5y:26.5,sharpe:0.92,stdDev:21.8,rating:3},
-  {name:"Parag Parikh Flexi Cap",house:"PPFAS",cat:"Flexi Cap",aum:78160,exp:0.58,r1y:13.5,r3y:19.8,r5y:22.8,sharpe:1.02,stdDev:15.8,rating:5},
+  {name:"Axis Small Cap Fund",house:"Axis",cat:"Small Cap",aum:22000,exp:0.55,r1y:11.5,r3y:22.8,r5y:27.2,sharpe:0.97,stdDev:20.5,rating:4},
+  {name:"Canara Robeco Small Cap Fund",house:"Canara Robeco",cat:"Small Cap",aum:10200,exp:0.58,r1y:13.5,r3y:24.8,r5y:28.5,sharpe:1.08,stdDev:21.2,rating:4},
+  {name:"Kotak Small Cap Fund",house:"Kotak",cat:"Small Cap",aum:15800,exp:0.54,r1y:12.8,r3y:23.5,r5y:27.8,sharpe:1.02,stdDev:21.0,rating:4},
+  {name:"Franklin India Smaller Companies",house:"Franklin Templeton",cat:"Small Cap",aum:12500,exp:0.95,r1y:13.2,r3y:25.2,r5y:29.2,sharpe:1.08,stdDev:21.8,rating:4},
+  {name:"ABSL Small Cap Fund",house:"Aditya Birla SL",cat:"Small Cap",aum:5200,exp:0.99,r1y:10.5,r3y:22.1,r5y:26.8,sharpe:0.95,stdDev:21.5,rating:3},
+  {name:"Invesco India Smallcap Fund",house:"Invesco",cat:"Small Cap",aum:4800,exp:0.68,r1y:13.8,r3y:25.5,r5y:29.8,sharpe:1.10,stdDev:22.0,rating:4},
+  {name:"Baroda BNP Paribas Small Cap",house:"Baroda BNP Paribas",cat:"Small Cap",aum:2200,exp:0.82,r1y:12.5,r3y:23.8,r5y:28.0,sharpe:1.02,stdDev:21.5,rating:4},
+  {name:"Edelweiss Small Cap Fund",house:"Edelweiss",cat:"Small Cap",aum:3800,exp:0.55,r1y:13.5,r3y:25.0,r5y:29.2,sharpe:1.07,stdDev:21.8,rating:4},
+  {name:"Union Small Cap Fund",house:"Union",cat:"Small Cap",aum:1850,exp:0.75,r1y:12.8,r3y:23.5,r5y:27.5,sharpe:1.01,stdDev:21.2,rating:3},
+  {name:"UTI Small Cap Fund",house:"UTI",cat:"Small Cap",aum:4200,exp:0.72,r1y:11.8,r3y:22.5,r5y:27.0,sharpe:0.98,stdDev:21.0,rating:3},
+  {name:"Mirae Asset Small Cap Fund",house:"Mirae Asset",cat:"Small Cap",aum:5800,exp:0.58,r1y:12.5,r3y:24.2,r5y:28.5,sharpe:1.05,stdDev:21.8,rating:4},
+  {name:"WhiteOak Capital Small Cap",house:"WhiteOak Capital",cat:"Small Cap",aum:3500,exp:0.58,r1y:14.2,r3y:26.5,r5y:30.5,sharpe:1.15,stdDev:22.5,rating:4},
+  {name:"Bandhan Small Cap Fund",house:"Bandhan",cat:"Small Cap",aum:7200,exp:0.58,r1y:12.2,r3y:23.8,r5y:28.2,sharpe:1.02,stdDev:21.5,rating:4},
+  {name:"PGIM India Small Cap Fund",house:"PGIM India",cat:"Small Cap",aum:2500,exp:0.52,r1y:11.5,r3y:23.0,r5y:27.5,sharpe:0.99,stdDev:21.2,rating:3},
+  {name:"Mahindra Manulife Small Cap",house:"Mahindra Manulife",cat:"Small Cap",aum:1800,exp:0.72,r1y:12.0,r3y:23.2,r5y:27.8,sharpe:1.00,stdDev:21.5,rating:3},
+  {name:"LIC MF Small Cap Fund",house:"LIC MF",cat:"Small Cap",aum:1200,exp:0.85,r1y:11.2,r3y:22.0,r5y:26.5,sharpe:0.95,stdDev:21.8,rating:3},
+  {name:"Sundaram Small Cap Fund",house:"Sundaram",cat:"Small Cap",aum:3200,exp:0.92,r1y:10.8,r3y:21.5,r5y:26.2,sharpe:0.92,stdDev:21.0,rating:3},
+  {name:"360 ONE Small Cap Fund",house:"360 ONE",cat:"Small Cap",aum:3800,exp:0.62,r1y:13.0,r3y:24.5,r5y:28.8,sharpe:1.05,stdDev:22.0,rating:4},
+  {name:"Motilal Oswal Small Cap Fund",house:"Motilal Oswal",cat:"Small Cap",aum:5500,exp:0.62,r1y:16.8,r3y:28.5,r5y:31.5,sharpe:1.20,stdDev:23.5,rating:5},
+  {name:"ICICI Pru Small Cap Fund",house:"ICICI Prudential",cat:"Small Cap",aum:8500,exp:0.88,r1y:12.8,r3y:24.5,r5y:28.8,sharpe:1.05,stdDev:22.0,rating:4},
+  {name:"JM Small Cap Fund",house:"JM",cat:"Small Cap",aum:750,exp:0.62,r1y:15.5,r3y:27.5,r5y:31.0,sharpe:1.18,stdDev:23.0,rating:4},
+
+  // === FLEXI CAP ===
+  {name:"Parag Parikh Flexi Cap Fund",house:"PPFAS",cat:"Flexi Cap",aum:78160,exp:0.58,r1y:13.5,r3y:19.8,r5y:22.8,sharpe:1.02,stdDev:15.8,rating:5},
   {name:"HDFC Flexi Cap Fund",house:"HDFC",cat:"Flexi Cap",aum:64000,exp:0.78,r1y:10.8,r3y:19.4,r5y:21.5,sharpe:0.91,stdDev:16.5,rating:4},
   {name:"Kotak Flexicap Fund",house:"Kotak",cat:"Flexi Cap",aum:48000,exp:0.55,r1y:9.2,r3y:17.1,r5y:18.8,sharpe:0.74,stdDev:15.2,rating:3},
   {name:"JM Flexicap Fund",house:"JM",cat:"Flexi Cap",aum:5200,exp:0.57,r1y:16.2,r3y:22.8,r5y:23.4,sharpe:1.05,stdDev:17.8,rating:4},
   {name:"UTI Flexi Cap Fund",house:"UTI",cat:"Flexi Cap",aum:25000,exp:0.89,r1y:8.1,r3y:15.2,r5y:17.5,sharpe:0.62,stdDev:16.8,rating:3},
-  {name:"Quant ELSS Tax Saver",house:"Quant",cat:"ELSS",aum:12000,exp:0.50,r1y:15.8,r3y:28.4,r5y:32.5,sharpe:1.22,stdDev:22.4,rating:5},
+  {name:"ABSL Flexi Cap Fund",house:"Aditya Birla SL",cat:"Flexi Cap",aum:16500,exp:0.98,r1y:9.5,r3y:17.8,r5y:19.5,sharpe:0.80,stdDev:16.0,rating:3},
+  {name:"Franklin India Flexi Cap Fund",house:"Franklin Templeton",cat:"Flexi Cap",aum:14200,exp:0.95,r1y:10.8,r3y:19.2,r5y:21.2,sharpe:0.89,stdDev:16.5,rating:4},
+  {name:"Nippon India Flexi Cap Fund",house:"Nippon",cat:"Flexi Cap",aum:12800,exp:0.88,r1y:10.5,r3y:18.5,r5y:20.8,sharpe:0.85,stdDev:16.2,rating:3},
+  {name:"Canara Robeco Flexi Cap Fund",house:"Canara Robeco",cat:"Flexi Cap",aum:8200,exp:0.56,r1y:9.8,r3y:18.2,r5y:20.5,sharpe:0.84,stdDev:16.0,rating:4},
+  {name:"Tata Flexi Cap Fund",house:"Tata",cat:"Flexi Cap",aum:6800,exp:0.62,r1y:10.5,r3y:18.8,r5y:21.0,sharpe:0.87,stdDev:16.2,rating:4},
+  {name:"Axis Flexi Cap Fund",house:"Axis",cat:"Flexi Cap",aum:10500,exp:0.58,r1y:8.5,r3y:15.8,r5y:17.8,sharpe:0.68,stdDev:14.8,rating:3},
+  {name:"Baroda BNP Paribas Flexi Cap",house:"Baroda BNP Paribas",cat:"Flexi Cap",aum:2200,exp:0.78,r1y:9.5,r3y:17.5,r5y:19.8,sharpe:0.80,stdDev:15.8,rating:3},
+  {name:"DSP Flexi Cap Fund",house:"DSP",cat:"Flexi Cap",aum:11200,exp:0.75,r1y:9.8,r3y:17.8,r5y:20.2,sharpe:0.82,stdDev:15.5,rating:3},
+  {name:"Invesco India Flexi Cap Fund",house:"Invesco",cat:"Flexi Cap",aum:2800,exp:0.68,r1y:10.2,r3y:18.5,r5y:20.8,sharpe:0.85,stdDev:15.8,rating:4},
+  {name:"WhiteOak Capital Flexi Cap",house:"WhiteOak Capital",cat:"Flexi Cap",aum:5800,exp:0.55,r1y:11.5,r3y:20.5,r5y:22.8,sharpe:0.95,stdDev:16.5,rating:4},
+  {name:"Quant Flexi Cap Fund",house:"Quant",cat:"Flexi Cap",aum:4800,exp:0.58,r1y:14.5,r3y:23.5,r5y:25.8,sharpe:1.05,stdDev:18.5,rating:4},
+  {name:"360 ONE Flexi Cap Fund",house:"360 ONE",cat:"Flexi Cap",aum:6500,exp:0.65,r1y:12.5,r3y:21.5,r5y:23.8,sharpe:0.98,stdDev:17.2,rating:4},
+  {name:"Sundaram Flexi Cap Fund",house:"Sundaram",cat:"Flexi Cap",aum:1850,exp:0.85,r1y:9.2,r3y:17.0,r5y:18.5,sharpe:0.75,stdDev:15.8,rating:3},
+  {name:"Mahindra Manulife Flexi Cap",house:"Mahindra Manulife",cat:"Flexi Cap",aum:2200,exp:0.72,r1y:10.0,r3y:18.0,r5y:20.2,sharpe:0.82,stdDev:15.8,rating:3},
+  {name:"ICICI Pru Flexicap Fund",house:"ICICI Prudential",cat:"Flexi Cap",aum:9500,exp:0.92,r1y:11.5,r3y:20.5,r5y:22.5,sharpe:0.95,stdDev:16.8,rating:4},
+  {name:"SBI Flexicap Fund",house:"SBI",cat:"Flexi Cap",aum:24000,exp:0.85,r1y:10.2,r3y:18.8,r5y:20.8,sharpe:0.87,stdDev:16.5,rating:3},
+
+  // === MULTI CAP ===
+  {name:"Nippon India Multi Cap Fund",house:"Nippon",cat:"Multi Cap",aum:30500,exp:0.85,r1y:15.8,r3y:27.5,r5y:29.8,sharpe:1.18,stdDev:19.5,rating:5},
+  {name:"Quant Active Fund",house:"Quant",cat:"Multi Cap",aum:10200,exp:0.58,r1y:14.8,r3y:29.5,r5y:33.2,sharpe:1.25,stdDev:22.5,rating:5},
+  {name:"HDFC Multi Cap Fund",house:"HDFC",cat:"Multi Cap",aum:15200,exp:0.72,r1y:13.5,r3y:24.8,r5y:27.5,sharpe:1.08,stdDev:19.0,rating:4},
+  {name:"Kotak Multicap Fund",house:"Kotak",cat:"Multi Cap",aum:12800,exp:0.58,r1y:12.8,r3y:23.2,r5y:26.2,sharpe:1.02,stdDev:18.5,rating:4},
+  {name:"Invesco India Multicap Fund",house:"Invesco",cat:"Multi Cap",aum:4200,exp:0.68,r1y:13.8,r3y:25.5,r5y:28.8,sharpe:1.10,stdDev:19.5,rating:4},
+  {name:"Mahindra Manulife Multi Cap",house:"Mahindra Manulife",cat:"Multi Cap",aum:2800,exp:0.72,r1y:12.5,r3y:23.0,r5y:26.0,sharpe:1.00,stdDev:18.8,rating:4},
+  {name:"ITI Multi Cap Fund",house:"ITI",cat:"Multi Cap",aum:1200,exp:0.85,r1y:12.0,r3y:22.5,r5y:25.5,sharpe:0.98,stdDev:18.5,rating:3},
+  {name:"Baroda BNP Paribas Multi Cap",house:"Baroda BNP Paribas",cat:"Multi Cap",aum:2200,exp:0.78,r1y:13.2,r3y:24.2,r5y:27.2,sharpe:1.05,stdDev:19.0,rating:4},
+  {name:"ICICI Pru Multicap Fund",house:"ICICI Prudential",cat:"Multi Cap",aum:11500,exp:0.92,r1y:14.2,r3y:25.5,r5y:28.2,sharpe:1.10,stdDev:19.5,rating:4},
+  {name:"Axis Multicap Fund",house:"Axis",cat:"Multi Cap",aum:5800,exp:0.55,r1y:10.5,r3y:20.5,r5y:23.5,sharpe:0.90,stdDev:17.5,rating:3},
+  {name:"Mirae Asset Multi Cap Fund",house:"Mirae Asset",cat:"Multi Cap",aum:6200,exp:0.58,r1y:13.5,r3y:24.8,r5y:27.8,sharpe:1.08,stdDev:19.2,rating:4},
+  {name:"ABSL Multi Cap Fund",house:"Aditya Birla SL",cat:"Multi Cap",aum:3800,exp:0.95,r1y:11.8,r3y:22.0,r5y:25.2,sharpe:0.96,stdDev:18.5,rating:3},
+  {name:"SBI Multi Cap Fund",house:"SBI",cat:"Multi Cap",aum:7500,exp:0.88,r1y:12.5,r3y:23.5,r5y:26.8,sharpe:1.02,stdDev:19.0,rating:4},
+  {name:"Tata Multi Cap Fund",house:"Tata",cat:"Multi Cap",aum:2500,exp:0.65,r1y:12.8,r3y:23.8,r5y:27.0,sharpe:1.04,stdDev:19.2,rating:4},
+  {name:"Motilal Oswal Multicap Fund",house:"Motilal Oswal",cat:"Multi Cap",aum:8200,exp:0.62,r1y:17.5,r3y:28.5,r5y:30.5,sharpe:1.22,stdDev:21.5,rating:5},
+  {name:"WhiteOak Capital Multicap Fund",house:"WhiteOak Capital",cat:"Multi Cap",aum:3200,exp:0.58,r1y:14.2,r3y:26.0,r5y:29.0,sharpe:1.12,stdDev:20.0,rating:4},
+
+  // === LARGE & MID CAP ===
+  {name:"Mirae Asset Large & Midcap",house:"Mirae Asset",cat:"Large & Mid Cap",aum:35000,exp:0.58,r1y:11.5,r3y:20.8,r5y:23.5,sharpe:0.98,stdDev:16.8,rating:5},
+  {name:"Canara Robeco Emerging Equities",house:"Canara Robeco",cat:"Large & Mid Cap",aum:18500,exp:0.55,r1y:10.8,r3y:19.5,r5y:22.0,sharpe:0.91,stdDev:15.8,rating:4},
+  {name:"ICICI Pru Large & Mid Cap Fund",house:"ICICI Prudential",cat:"Large & Mid Cap",aum:15800,exp:0.95,r1y:12.8,r3y:22.5,r5y:24.8,sharpe:1.05,stdDev:17.5,rating:4},
+  {name:"DSP Equity Opportunities Fund",house:"DSP",cat:"Large & Mid Cap",aum:12500,exp:0.82,r1y:11.2,r3y:20.2,r5y:23.0,sharpe:0.92,stdDev:16.5,rating:4},
+  {name:"SBI Large & Midcap Fund",house:"SBI",cat:"Large & Mid Cap",aum:22000,exp:0.88,r1y:10.5,r3y:18.8,r5y:21.5,sharpe:0.85,stdDev:16.2,rating:3},
+  {name:"HDFC Large and Mid Cap Fund",house:"HDFC",cat:"Large & Mid Cap",aum:18000,exp:0.75,r1y:11.8,r3y:21.5,r5y:24.2,sharpe:0.98,stdDev:17.0,rating:4},
+  {name:"Kotak Equity Opportunities Fund",house:"Kotak",cat:"Large & Mid Cap",aum:25000,exp:0.52,r1y:11.5,r3y:21.2,r5y:23.8,sharpe:0.96,stdDev:17.0,rating:4},
+  {name:"Axis Growth Opportunities Fund",house:"Axis",cat:"Large & Mid Cap",aum:14500,exp:0.58,r1y:10.2,r3y:18.5,r5y:21.5,sharpe:0.84,stdDev:15.8,rating:3},
+  {name:"Franklin India Equity Advantage",house:"Franklin Templeton",cat:"Large & Mid Cap",aum:4200,exp:0.95,r1y:11.0,r3y:20.0,r5y:22.8,sharpe:0.90,stdDev:16.5,rating:3},
+  {name:"Invesco India Growth Opp Fund",house:"Invesco",cat:"Large & Mid Cap",aum:5800,exp:0.68,r1y:11.8,r3y:21.2,r5y:23.8,sharpe:0.96,stdDev:16.8,rating:4},
+  {name:"UTI Core Equity Fund",house:"UTI",cat:"Large & Mid Cap",aum:2800,exp:0.85,r1y:10.2,r3y:19.0,r5y:21.8,sharpe:0.86,stdDev:16.5,rating:3},
+  {name:"Nippon India Vision Fund",house:"Nippon",cat:"Large & Mid Cap",aum:5200,exp:0.88,r1y:11.5,r3y:20.5,r5y:23.0,sharpe:0.92,stdDev:17.0,rating:3},
+  {name:"Bandhan Core Equity Fund",house:"Bandhan",cat:"Large & Mid Cap",aum:3800,exp:0.75,r1y:11.2,r3y:20.8,r5y:23.2,sharpe:0.94,stdDev:16.8,rating:4},
+  {name:"Edelweiss Large & Mid Cap Fund",house:"Edelweiss",cat:"Large & Mid Cap",aum:2200,exp:0.65,r1y:11.5,r3y:21.0,r5y:23.5,sharpe:0.96,stdDev:16.8,rating:4},
+  {name:"Tata Large & Midcap Fund",house:"Tata",cat:"Large & Mid Cap",aum:6800,exp:0.68,r1y:11.8,r3y:21.5,r5y:24.0,sharpe:0.97,stdDev:17.2,rating:4},
+  {name:"Motilal Oswal Large & Midcap",house:"Motilal Oswal",cat:"Large & Mid Cap",aum:4500,exp:0.62,r1y:14.5,r3y:24.5,r5y:27.0,sharpe:1.08,stdDev:18.5,rating:4},
+  {name:"Quant Large & Mid Cap Fund",house:"Quant",cat:"Large & Mid Cap",aum:2200,exp:0.60,r1y:14.8,r3y:25.5,r5y:27.8,sharpe:1.12,stdDev:19.0,rating:4},
+  {name:"WhiteOak Capital Large & Mid",house:"WhiteOak Capital",cat:"Large & Mid Cap",aum:3500,exp:0.58,r1y:12.5,r3y:22.5,r5y:25.0,sharpe:1.02,stdDev:17.5,rating:4},
+
+  // === ELSS ===
+  {name:"Quant ELSS Tax Saver Fund",house:"Quant",cat:"ELSS",aum:12000,exp:0.50,r1y:15.8,r3y:28.4,r5y:32.5,sharpe:1.22,stdDev:22.4,rating:5},
   {name:"Motilal Oswal ELSS Tax Saver",house:"Motilal Oswal",cat:"ELSS",aum:4500,exp:0.71,r1y:12.5,r3y:22.1,r5y:17.4,sharpe:0.92,stdDev:18.2,rating:4},
   {name:"Mirae Asset ELSS Tax Saver",house:"Mirae Asset",cat:"ELSS",aum:22000,exp:0.51,r1y:10.2,r3y:18.5,r5y:19.8,sharpe:0.85,stdDev:16.8,rating:4},
   {name:"SBI Long Term Equity (ELSS)",house:"SBI",cat:"ELSS",aum:25000,exp:1.02,r1y:11.5,r3y:19.8,r5y:20.2,sharpe:0.87,stdDev:17.8,rating:3},
-  {name:"Bandhan ELSS Tax Saver",house:"Bandhan",cat:"ELSS",aum:7200,exp:0.62,r1y:11.8,r3y:22.1,r5y:18.2,sharpe:0.93,stdDev:17.5,rating:4},
-  {name:"ICICI Pru Equity & Debt",house:"ICICI Prudential",cat:"Hybrid",aum:50312,exp:0.95,r1y:8.4,r3y:19.5,r5y:19.2,sharpe:1.09,stdDev:12.8,rating:5},
-  {name:"HDFC Balanced Advantage",house:"HDFC",cat:"Hybrid",aum:90000,exp:0.76,r1y:9.2,r3y:16.5,r5y:17.8,sharpe:0.82,stdDev:12.1,rating:4},
+  {name:"Bandhan ELSS Tax Saver Fund",house:"Bandhan",cat:"ELSS",aum:7200,exp:0.62,r1y:11.8,r3y:22.1,r5y:18.2,sharpe:0.93,stdDev:17.5,rating:4},
+  {name:"HDFC ELSS Tax Saver Fund",house:"HDFC",cat:"ELSS",aum:15200,exp:0.78,r1y:12.5,r3y:22.8,r5y:22.5,sharpe:0.98,stdDev:18.5,rating:4},
+  {name:"Axis ELSS Tax Saver Fund",house:"Axis",cat:"ELSS",aum:38000,exp:0.55,r1y:8.5,r3y:15.8,r5y:17.2,sharpe:0.65,stdDev:15.8,rating:3},
+  {name:"Franklin India ELSS Tax Saver",house:"Franklin Templeton",cat:"ELSS",aum:6200,exp:0.95,r1y:11.2,r3y:20.5,r5y:21.8,sharpe:0.90,stdDev:17.5,rating:3},
+  {name:"Canara Robeco ELSS Tax Saver",house:"Canara Robeco",cat:"ELSS",aum:8500,exp:0.56,r1y:10.5,r3y:19.5,r5y:20.8,sharpe:0.88,stdDev:16.8,rating:4},
+  {name:"Kotak ELSS Tax Saver Fund",house:"Kotak",cat:"ELSS",aum:5800,exp:0.58,r1y:11.0,r3y:20.2,r5y:21.5,sharpe:0.89,stdDev:17.2,rating:4},
+  {name:"DSP ELSS Tax Saver Fund",house:"DSP",cat:"ELSS",aum:4500,exp:0.82,r1y:10.8,r3y:20.8,r5y:22.0,sharpe:0.91,stdDev:17.5,rating:4},
+  {name:"UTI Long Term Equity Fund",house:"UTI",cat:"ELSS",aum:5200,exp:0.88,r1y:9.8,r3y:18.5,r5y:19.8,sharpe:0.82,stdDev:17.0,rating:3},
+  {name:"Tata India Tax Savings Fund",house:"Tata",cat:"ELSS",aum:4800,exp:0.62,r1y:11.5,r3y:21.0,r5y:22.2,sharpe:0.92,stdDev:17.8,rating:4},
+  {name:"ICICI Pru Long Term Equity",house:"ICICI Prudential",cat:"ELSS",aum:14200,exp:0.95,r1y:11.8,r3y:21.5,r5y:22.5,sharpe:0.94,stdDev:18.0,rating:4},
+  {name:"Nippon India ELSS Tax Saver",house:"Nippon",cat:"ELSS",aum:6800,exp:0.88,r1y:11.2,r3y:21.2,r5y:22.0,sharpe:0.93,stdDev:17.8,rating:4},
+  {name:"ABSL ELSS Tax Relief 96",house:"Aditya Birla SL",cat:"ELSS",aum:16800,exp:1.05,r1y:10.8,r3y:20.5,r5y:21.2,sharpe:0.88,stdDev:17.5,rating:3},
+  {name:"Sundaram Diversified Equity ELSS",house:"Sundaram",cat:"ELSS",aum:1200,exp:0.92,r1y:10.5,r3y:19.8,r5y:20.5,sharpe:0.86,stdDev:17.2,rating:3},
+  {name:"Baroda BNP Paribas ELSS Fund",house:"Baroda BNP Paribas",cat:"ELSS",aum:1050,exp:0.82,r1y:10.2,r3y:19.5,r5y:20.2,sharpe:0.84,stdDev:17.0,rating:3},
+  {name:"WhiteOak Capital ELSS Tax Saver",house:"WhiteOak Capital",cat:"ELSS",aum:2200,exp:0.55,r1y:12.5,r3y:22.5,r5y:24.0,sharpe:1.00,stdDev:18.0,rating:4},
+  {name:"Edelweiss Long Term Equity Fund",house:"Edelweiss",cat:"ELSS",aum:1800,exp:0.62,r1y:11.2,r3y:21.0,r5y:22.5,sharpe:0.92,stdDev:17.5,rating:4},
+  {name:"Mirae Asset Tax Saver (ELSS)",house:"Mirae Asset",cat:"ELSS",aum:22000,exp:0.51,r1y:10.5,r3y:19.2,r5y:21.0,sharpe:0.87,stdDev:16.9,rating:4},
+  {name:"LIC MF ELSS Fund",house:"LIC MF",cat:"ELSS",aum:820,exp:1.05,r1y:9.5,r3y:18.0,r5y:19.0,sharpe:0.78,stdDev:17.0,rating:2},
+
+  // === HYBRID ===
+  {name:"ICICI Pru Equity & Debt Fund",house:"ICICI Prudential",cat:"Hybrid",aum:50312,exp:0.95,r1y:8.4,r3y:19.5,r5y:19.2,sharpe:1.09,stdDev:12.8,rating:5},
+  {name:"HDFC Balanced Advantage Fund",house:"HDFC",cat:"Hybrid",aum:90000,exp:0.76,r1y:9.2,r3y:16.5,r5y:17.8,sharpe:0.82,stdDev:12.1,rating:4},
   {name:"SBI Equity Hybrid Fund",house:"SBI",cat:"Hybrid",aum:68000,exp:0.72,r1y:8.5,r3y:15.8,r5y:16.5,sharpe:0.71,stdDev:12.5,rating:3},
+  {name:"ICICI Pru Balanced Advantage",house:"ICICI Prudential",cat:"Hybrid",aum:56000,exp:0.95,r1y:11.2,r3y:18.5,r5y:18.8,sharpe:0.95,stdDev:11.5,rating:5},
+  {name:"Kotak Equity Hybrid Fund",house:"Kotak",cat:"Hybrid",aum:8500,exp:0.55,r1y:9.5,r3y:17.8,r5y:18.5,sharpe:0.88,stdDev:13.2,rating:4},
+  {name:"Mirae Asset Hybrid Equity Fund",house:"Mirae Asset",cat:"Hybrid",aum:12500,exp:0.58,r1y:9.2,r3y:17.5,r5y:18.2,sharpe:0.85,stdDev:13.0,rating:4},
+  {name:"Canara Robeco Equity Hybrid",house:"Canara Robeco",cat:"Hybrid",aum:8200,exp:0.58,r1y:9.0,r3y:17.0,r5y:17.8,sharpe:0.82,stdDev:12.8,rating:4},
+  {name:"DSP Equity & Bond Fund",house:"DSP",cat:"Hybrid",aum:8800,exp:0.82,r1y:8.8,r3y:16.5,r5y:17.2,sharpe:0.78,stdDev:12.5,rating:3},
+  {name:"Franklin India Equity Hybrid",house:"Franklin Templeton",cat:"Hybrid",aum:4500,exp:0.95,r1y:9.0,r3y:17.2,r5y:17.8,sharpe:0.82,stdDev:12.8,rating:3},
+  {name:"Nippon India Equity Hybrid",house:"Nippon",cat:"Hybrid",aum:4200,exp:0.95,r1y:8.8,r3y:16.8,r5y:17.5,sharpe:0.80,stdDev:12.8,rating:3},
+  {name:"Axis Equity Hybrid Fund",house:"Axis",cat:"Hybrid",aum:5500,exp:0.62,r1y:8.5,r3y:15.5,r5y:16.5,sharpe:0.70,stdDev:12.2,rating:3},
+  {name:"UTI Aggressive Hybrid Fund",house:"UTI",cat:"Hybrid",aum:5800,exp:0.88,r1y:8.2,r3y:15.2,r5y:16.0,sharpe:0.68,stdDev:12.0,rating:3},
+  {name:"Tata Hybrid Equity Fund",house:"Tata",cat:"Hybrid",aum:4200,exp:0.68,r1y:9.2,r3y:17.5,r5y:18.0,sharpe:0.84,stdDev:12.8,rating:4},
+  {name:"ABSL Equity Hybrid Fund",house:"Aditya Birla SL",cat:"Hybrid",aum:12800,exp:1.05,r1y:8.5,r3y:16.0,r5y:16.8,sharpe:0.72,stdDev:12.5,rating:3},
+  {name:"Edelweiss Aggressive Hybrid Fund",house:"Edelweiss",cat:"Hybrid",aum:2200,exp:0.68,r1y:9.8,r3y:18.5,r5y:19.2,sharpe:0.92,stdDev:13.5,rating:4},
+  {name:"Quant Absolute Fund",house:"Quant",cat:"Hybrid",aum:2800,exp:0.55,r1y:11.5,r3y:22.5,r5y:24.8,sharpe:1.08,stdDev:15.8,rating:4},
+  {name:"JM Equity Hybrid Fund",house:"JM",cat:"Hybrid",aum:1200,exp:0.62,r1y:12.5,r3y:21.8,r5y:22.5,sharpe:1.02,stdDev:15.5,rating:4},
+  {name:"Bandhan Aggressive Hybrid Fund",house:"Bandhan",cat:"Hybrid",aum:1500,exp:0.72,r1y:9.5,r3y:18.0,r5y:18.8,sharpe:0.86,stdDev:13.2,rating:3},
+  {name:"Baroda BNP Paribas Aggr Hybrid",house:"Baroda BNP Paribas",cat:"Hybrid",aum:1800,exp:0.85,r1y:9.0,r3y:17.2,r5y:17.8,sharpe:0.82,stdDev:13.0,rating:3},
+  {name:"HDFC Multi-Asset Fund",house:"HDFC",cat:"Hybrid",aum:12500,exp:0.76,r1y:10.5,r3y:17.8,r5y:18.5,sharpe:0.88,stdDev:11.8,rating:4},
+  {name:"Motilal Oswal Balanced Advantage",house:"Motilal Oswal",cat:"Hybrid",aum:2500,exp:0.65,r1y:12.5,r3y:20.5,r5y:21.8,sharpe:1.00,stdDev:13.5,rating:4},
+
+  // === INDEX ===
   {name:"UTI Nifty 50 Index Fund",house:"UTI",cat:"Index",aum:21000,exp:0.20,r1y:8.2,r3y:15.8,r5y:16.1,sharpe:0.72,stdDev:14.2,rating:4},
   {name:"HDFC Nifty 50 Index Fund",house:"HDFC",cat:"Index",aum:18500,exp:0.20,r1y:8.0,r3y:15.6,r5y:15.9,sharpe:0.71,stdDev:14.3,rating:4},
-  {name:"Nippon Nifty 500 Multicap Index",house:"Nippon",cat:"Index",aum:8200,exp:0.22,r1y:11.5,r3y:20.2,r5y:22.5,sharpe:0.95,stdDev:16.8,rating:4},
+  {name:"Nippon India Nifty 500 Multicap",house:"Nippon",cat:"Index",aum:8200,exp:0.22,r1y:11.5,r3y:20.2,r5y:22.5,sharpe:0.95,stdDev:16.8,rating:4},
+  {name:"ICICI Pru Nifty 50 Index Fund",house:"ICICI Prudential",cat:"Index",aum:16800,exp:0.17,r1y:8.1,r3y:15.7,r5y:16.0,sharpe:0.72,stdDev:14.2,rating:4},
+  {name:"SBI Nifty 50 Index Fund",house:"SBI",cat:"Index",aum:12500,exp:0.20,r1y:8.0,r3y:15.6,r5y:15.9,sharpe:0.71,stdDev:14.3,rating:4},
+  {name:"Axis Nifty 50 Index Fund",house:"Axis",cat:"Index",aum:4200,exp:0.20,r1y:8.0,r3y:15.5,r5y:15.8,sharpe:0.71,stdDev:14.2,rating:4},
+  {name:"Kotak Nifty 50 Index Fund",house:"Kotak",cat:"Index",aum:5800,exp:0.20,r1y:8.0,r3y:15.6,r5y:15.9,sharpe:0.71,stdDev:14.3,rating:4},
+  {name:"Mirae Asset Nifty 50 Index Fund",house:"Mirae Asset",cat:"Index",aum:6500,exp:0.18,r1y:8.1,r3y:15.7,r5y:16.0,sharpe:0.72,stdDev:14.2,rating:4},
+  {name:"ABSL Nifty 50 Index Fund",house:"Aditya Birla SL",cat:"Index",aum:3800,exp:0.20,r1y:8.0,r3y:15.5,r5y:15.8,sharpe:0.71,stdDev:14.3,rating:4},
+  {name:"UTI Nifty Next 50 Index Fund",house:"UTI",cat:"Index",aum:8500,exp:0.30,r1y:12.5,r3y:20.5,r5y:22.0,sharpe:0.92,stdDev:17.5,rating:4},
+  {name:"HDFC Nifty Next 50 Index Fund",house:"HDFC",cat:"Index",aum:4500,exp:0.30,r1y:12.4,r3y:20.3,r5y:21.8,sharpe:0.91,stdDev:17.5,rating:4},
+  {name:"Nippon India Nifty Next 50",house:"Nippon",cat:"Index",aum:3800,exp:0.28,r1y:12.5,r3y:20.4,r5y:22.0,sharpe:0.92,stdDev:17.5,rating:4},
+  {name:"Motilal Oswal Nifty Midcap 150",house:"Motilal Oswal",cat:"Index",aum:12500,exp:0.30,r1y:15.2,r3y:23.5,r5y:26.8,sharpe:1.05,stdDev:19.5,rating:4},
+  {name:"Nippon India Nifty Midcap 150",house:"Nippon",cat:"Index",aum:9800,exp:0.28,r1y:15.0,r3y:23.2,r5y:26.5,sharpe:1.04,stdDev:19.5,rating:4},
+  {name:"UTI Nifty Midcap 150 Index Fund",house:"UTI",cat:"Index",aum:7800,exp:0.32,r1y:14.9,r3y:23.0,r5y:26.2,sharpe:1.03,stdDev:19.4,rating:4},
+  {name:"ICICI Pru Nifty Midcap 150 Index",house:"ICICI Prudential",cat:"Index",aum:6500,exp:0.28,r1y:15.0,r3y:23.2,r5y:26.5,sharpe:1.04,stdDev:19.5,rating:4},
+  {name:"Mirae Asset Nifty Midcap 150",house:"Mirae Asset",cat:"Index",aum:4200,exp:0.28,r1y:15.0,r3y:23.0,r5y:26.2,sharpe:1.03,stdDev:19.4,rating:4},
+  {name:"Motilal Oswal Nifty 500 Index",house:"Motilal Oswal",cat:"Index",aum:8200,exp:0.22,r1y:10.5,r3y:18.8,r5y:20.8,sharpe:0.90,stdDev:16.0,rating:4},
+  {name:"Motilal Oswal S&P 500 Index",house:"Motilal Oswal",cat:"Index",aum:5800,exp:0.50,r1y:10.2,r3y:14.5,r5y:18.2,sharpe:0.75,stdDev:15.8,rating:3},
+  {name:"DSP Nifty 50 Equal Weight Index",house:"DSP",cat:"Index",aum:2800,exp:0.40,r1y:9.8,r3y:17.5,r5y:19.2,sharpe:0.82,stdDev:15.5,rating:4},
+  {name:"Nippon India Nifty Smallcap 250",house:"Nippon",cat:"Index",aum:3500,exp:0.30,r1y:16.5,r3y:26.5,r5y:30.2,sharpe:1.12,stdDev:22.5,rating:4},
+  {name:"Motilal Oswal Nifty Smallcap 250",house:"Motilal Oswal",cat:"Index",aum:4200,exp:0.30,r1y:16.2,r3y:26.2,r5y:29.8,sharpe:1.10,stdDev:22.5,rating:4},
+  {name:"ICICI Pru Nifty 200 Index Fund",house:"ICICI Prudential",cat:"Index",aum:2800,exp:0.20,r1y:9.2,r3y:17.2,r5y:19.0,sharpe:0.85,stdDev:15.2,rating:4},
+  {name:"Tata Nifty India Digital ETF FoF",house:"Tata",cat:"Index",aum:2500,exp:0.28,r1y:18.5,r3y:22.5,r5y:25.8,sharpe:0.95,stdDev:21.2,rating:3},
+  {name:"Navi Nifty 50 Index Fund",house:"Navi",cat:"Index",aum:1200,exp:0.06,r1y:8.0,r3y:15.5,r5y:15.8,sharpe:0.71,stdDev:14.2,rating:4},
+  {name:"HDFC Nifty 100 Index Fund",house:"HDFC",cat:"Index",aum:3800,exp:0.20,r1y:9.0,r3y:16.8,r5y:17.8,sharpe:0.80,stdDev:14.8,rating:4},
+  {name:"ICICI Pru Nifty 100 Low Vol 30",house:"ICICI Prudential",cat:"Index",aum:2200,exp:0.28,r1y:8.5,r3y:16.5,r5y:17.2,sharpe:0.85,stdDev:13.5,rating:4},
+
+  // === SECTORAL ===
   {name:"SBI PSU Fund",house:"SBI",cat:"Sectoral",aum:4800,exp:0.90,r1y:36.4,r3y:36.1,r5y:28.0,sharpe:0.63,stdDev:28.5,rating:4},
-  {name:"ICICI Pru Infrastructure Fund",house:"ICICI Prudential",cat:"Sectoral",aum:6800,exp:1.18,r1y:22.4,r3y:29.8,r5y:28.5,sharpe:0.72,stdDev:26.8,rating:3}
+  {name:"ICICI Pru Infrastructure Fund",house:"ICICI Prudential",cat:"Sectoral",aum:6800,exp:1.18,r1y:22.4,r3y:29.8,r5y:28.5,sharpe:0.72,stdDev:26.8,rating:3},
+  {name:"Nippon India Power & Infra Fund",house:"Nippon",cat:"Sectoral",aum:8500,exp:0.92,r1y:25.8,r3y:34.5,r5y:32.5,sharpe:0.82,stdDev:28.0,rating:4},
+  {name:"Quant Infrastructure Fund",house:"Quant",cat:"Sectoral",aum:3200,exp:0.62,r1y:28.5,r3y:38.5,r5y:35.2,sharpe:0.85,stdDev:29.5,rating:4},
+  {name:"UTI Infrastructure Fund",house:"UTI",cat:"Sectoral",aum:2200,exp:1.12,r1y:22.5,r3y:30.5,r5y:27.8,sharpe:0.70,stdDev:27.5,rating:3},
+  {name:"ABSL Infrastructure Fund",house:"Aditya Birla SL",cat:"Sectoral",aum:1800,exp:1.05,r1y:24.2,r3y:32.5,r5y:29.5,sharpe:0.75,stdDev:28.2,rating:3},
+  {name:"Canara Robeco Infrastructure",house:"Canara Robeco",cat:"Sectoral",aum:1200,exp:0.98,r1y:22.8,r3y:30.8,r5y:28.0,sharpe:0.72,stdDev:27.8,rating:3},
+  {name:"Invesco India Infrastructure Fund",house:"Invesco",cat:"Sectoral",aum:1500,exp:0.88,r1y:23.5,r3y:31.8,r5y:28.8,sharpe:0.74,stdDev:28.0,rating:3},
+  {name:"ICICI Pru Technology Fund",house:"ICICI Prudential",cat:"Sectoral",aum:12500,exp:1.12,r1y:14.5,r3y:18.5,r5y:26.5,sharpe:0.55,stdDev:25.2,rating:3},
+  {name:"SBI Technology Opp Fund",house:"SBI",cat:"Sectoral",aum:4800,exp:0.95,r1y:13.8,r3y:17.8,r5y:25.8,sharpe:0.50,stdDev:24.8,rating:3},
+  {name:"Tata Digital India Fund",house:"Tata",cat:"Sectoral",aum:9200,exp:0.25,r1y:14.2,r3y:18.2,r5y:26.2,sharpe:0.52,stdDev:24.8,rating:3},
+  {name:"ABSL Digital India Fund",house:"Aditya Birla SL",cat:"Sectoral",aum:4500,exp:1.05,r1y:13.5,r3y:17.5,r5y:25.2,sharpe:0.48,stdDev:24.5,rating:3},
+  {name:"Franklin India Technology Fund",house:"Franklin Templeton",cat:"Sectoral",aum:2200,exp:0.95,r1y:14.5,r3y:18.8,r5y:26.8,sharpe:0.55,stdDev:25.5,rating:3},
+  {name:"ICICI Pru Banking & Fin Serv Fund",house:"ICICI Prudential",cat:"Sectoral",aum:8500,exp:1.15,r1y:12.5,r3y:20.5,r5y:18.5,sharpe:0.55,stdDev:22.5,rating:3},
+  {name:"Nippon India Banking & Fin Serv",house:"Nippon",cat:"Sectoral",aum:5200,exp:0.98,r1y:11.8,r3y:19.8,r5y:17.8,sharpe:0.52,stdDev:22.0,rating:3},
+  {name:"SBI Banking & Financial Services",house:"SBI",cat:"Sectoral",aum:4200,exp:0.92,r1y:12.0,r3y:20.2,r5y:18.2,sharpe:0.54,stdDev:22.2,rating:3},
+  {name:"Mirae Asset Healthcare Fund",house:"Mirae Asset",cat:"Sectoral",aum:3800,exp:0.65,r1y:20.5,r3y:28.5,r5y:30.2,sharpe:0.88,stdDev:24.5,rating:4},
+  {name:"DSP Healthcare Fund",house:"DSP",cat:"Sectoral",aum:2800,exp:0.88,r1y:19.8,r3y:27.8,r5y:29.8,sharpe:0.85,stdDev:24.0,rating:4},
+  {name:"SBI Healthcare Opportunities Fund",house:"SBI",cat:"Sectoral",aum:3500,exp:1.05,r1y:18.5,r3y:26.5,r5y:28.5,sharpe:0.80,stdDev:23.5,rating:3},
+  {name:"Nippon India Pharma Fund",house:"Nippon",cat:"Sectoral",aum:6800,exp:0.95,r1y:19.2,r3y:27.2,r5y:29.2,sharpe:0.82,stdDev:24.0,rating:4},
+  {name:"UTI Healthcare Fund",house:"UTI",cat:"Sectoral",aum:1800,exp:0.92,r1y:17.5,r3y:25.5,r5y:27.5,sharpe:0.75,stdDev:23.5,rating:3},
+  {name:"ABSL Pharma & Healthcare Fund",house:"Aditya Birla SL",cat:"Sectoral",aum:2500,exp:1.05,r1y:18.2,r3y:26.8,r5y:28.8,sharpe:0.78,stdDev:23.8,rating:3},
+  {name:"Mirae Asset Great Consumer Fund",house:"Mirae Asset",cat:"Sectoral",aum:4800,exp:0.65,r1y:12.5,r3y:21.5,r5y:22.8,sharpe:0.72,stdDev:18.5,rating:4},
+  {name:"ICICI Pru FMCG Fund",house:"ICICI Prudential",cat:"Sectoral",aum:2200,exp:1.08,r1y:8.5,r3y:16.5,r5y:17.2,sharpe:0.55,stdDev:15.8,rating:3},
+  {name:"SBI Consumption Opportunities",house:"SBI",cat:"Sectoral",aum:2800,exp:0.95,r1y:11.5,r3y:20.2,r5y:21.5,sharpe:0.68,stdDev:17.8,rating:3},
+  {name:"Nippon India Consumption Fund",house:"Nippon",cat:"Sectoral",aum:1500,exp:0.95,r1y:12.0,r3y:21.0,r5y:22.0,sharpe:0.70,stdDev:18.0,rating:3},
+  {name:"Nippon India Nifty Realty Index",house:"Nippon",cat:"Sectoral",aum:2500,exp:0.32,r1y:28.5,r3y:40.5,r5y:35.5,sharpe:0.78,stdDev:32.5,rating:3},
+  {name:"ICICI Pru Commodities Fund",house:"ICICI Prudential",cat:"Sectoral",aum:1500,exp:1.05,r1y:18.5,r3y:28.5,r5y:25.8,sharpe:0.68,stdDev:26.5,rating:3},
+  {name:"Quant ESG Equity Fund",house:"Quant",cat:"Sectoral",aum:1200,exp:0.58,r1y:14.5,r3y:25.5,r5y:28.2,sharpe:1.05,stdDev:20.5,rating:4},
+  {name:"Axis ESG Equity Fund",house:"Axis",cat:"Sectoral",aum:1800,exp:0.65,r1y:8.5,r3y:15.8,r5y:17.5,sharpe:0.62,stdDev:16.5,rating:3},
+  {name:"SBI Magnum ESG Fund",house:"SBI",cat:"Sectoral",aum:2200,exp:0.85,r1y:9.2,r3y:17.5,r5y:18.5,sharpe:0.72,stdDev:16.8,rating:3},
+  {name:"ICICI Pru Transportation & Logist",house:"ICICI Prudential",cat:"Sectoral",aum:2800,exp:1.12,r1y:18.5,r3y:30.5,r5y:28.8,sharpe:0.72,stdDev:28.5,rating:3},
+  {name:"DSP Natural Resources & New Energy",house:"DSP",cat:"Sectoral",aum:1500,exp:0.92,r1y:15.5,r3y:25.8,r5y:24.5,sharpe:0.68,stdDev:25.8,rating:3},
+  {name:"Tata Resources & Energy Fund",house:"Tata",cat:"Sectoral",aum:1200,exp:0.68,r1y:16.5,r3y:27.5,r5y:26.5,sharpe:0.70,stdDev:26.5,rating:3},
+
+  // === VALUE / CONTRA ===
+  {name:"ICICI Pru Value Discovery Fund",house:"ICICI Prudential",cat:"Value/Contra",aum:42000,exp:1.00,r1y:16.8,r3y:28.5,r5y:28.2,sharpe:1.15,stdDev:18.5,rating:5},
+  {name:"SBI Contra Fund",house:"SBI",cat:"Value/Contra",aum:38000,exp:0.92,r1y:14.2,r3y:26.5,r5y:28.8,sharpe:1.12,stdDev:19.8,rating:5},
+  {name:"Invesco India Contra Fund",house:"Invesco",cat:"Value/Contra",aum:15800,exp:0.68,r1y:15.2,r3y:27.5,r5y:28.8,sharpe:1.15,stdDev:18.8,rating:5},
+  {name:"Nippon India Value Fund",house:"Nippon",cat:"Value/Contra",aum:8200,exp:0.95,r1y:14.5,r3y:25.8,r5y:26.5,sharpe:1.05,stdDev:18.0,rating:4},
+  {name:"UTI Value Fund",house:"UTI",cat:"Value/Contra",aum:10500,exp:0.88,r1y:13.5,r3y:24.2,r5y:25.2,sharpe:1.00,stdDev:17.5,rating:4},
+  {name:"Kotak India EQ Contra Fund",house:"Kotak",cat:"Value/Contra",aum:4200,exp:0.58,r1y:14.2,r3y:25.5,r5y:26.8,sharpe:1.08,stdDev:18.2,rating:4},
+  {name:"Tata Equity PE Fund",house:"Tata",cat:"Value/Contra",aum:8500,exp:0.68,r1y:14.8,r3y:26.5,r5y:27.5,sharpe:1.10,stdDev:18.5,rating:4},
+  {name:"DSP Value Fund",house:"DSP",cat:"Value/Contra",aum:3800,exp:0.82,r1y:13.8,r3y:24.8,r5y:26.0,sharpe:1.05,stdDev:17.8,rating:4},
+  {name:"JM Value Fund",house:"JM",cat:"Value/Contra",aum:1200,exp:0.62,r1y:16.5,r3y:28.5,r5y:29.5,sharpe:1.18,stdDev:19.2,rating:5},
+  {name:"ABSL Pure Value Fund",house:"Aditya Birla SL",cat:"Value/Contra",aum:5200,exp:1.05,r1y:13.5,r3y:24.5,r5y:26.0,sharpe:1.02,stdDev:18.0,rating:4},
+  {name:"Templeton India Value Fund",house:"Franklin Templeton",cat:"Value/Contra",aum:1800,exp:0.95,r1y:13.2,r3y:24.0,r5y:25.8,sharpe:1.00,stdDev:17.8,rating:3},
+  {name:"Quant Value Fund",house:"Quant",cat:"Value/Contra",aum:1500,exp:0.62,r1y:16.2,r3y:29.5,r5y:32.2,sharpe:1.22,stdDev:20.5,rating:4},
+  {name:"Bandhan Sterling Value Fund",house:"Bandhan",cat:"Value/Contra",aum:8500,exp:0.72,r1y:14.2,r3y:25.8,r5y:27.2,sharpe:1.08,stdDev:18.5,rating:4},
+  {name:"HDFC Capital Builder Value Fund",house:"HDFC",cat:"Value/Contra",aum:7200,exp:0.78,r1y:13.8,r3y:25.2,r5y:26.5,sharpe:1.05,stdDev:18.2,rating:4},
+  {name:"WhiteOak Capital Value Fund",house:"WhiteOak Capital",cat:"Value/Contra",aum:1800,exp:0.60,r1y:14.5,r3y:26.5,r5y:28.0,sharpe:1.10,stdDev:18.8,rating:4},
+  {name:"Axis Value Fund",house:"Axis",cat:"Value/Contra",aum:1500,exp:0.58,r1y:11.5,r3y:21.5,r5y:23.5,sharpe:0.95,stdDev:17.2,rating:3},
+
+  // === FOCUSED FUNDS ===
+  {name:"ICICI Pru Focused Equity Fund",house:"ICICI Prudential",cat:"Focused",aum:9800,exp:0.92,r1y:14.5,r3y:23.8,r5y:25.5,sharpe:1.05,stdDev:17.8,rating:4},
+  {name:"SBI Focused Equity Fund",house:"SBI",cat:"Focused",aum:32000,exp:0.78,r1y:12.5,r3y:21.5,r5y:22.8,sharpe:0.96,stdDev:16.5,rating:4},
+  {name:"Nippon India Focused Equity Fund",house:"Nippon",cat:"Focused",aum:6800,exp:0.85,r1y:13.5,r3y:22.8,r5y:24.2,sharpe:1.02,stdDev:17.0,rating:4},
+  {name:"Mirae Asset Focused Fund",house:"Mirae Asset",cat:"Focused",aum:12800,exp:0.55,r1y:13.8,r3y:22.5,r5y:24.5,sharpe:1.00,stdDev:16.8,rating:4},
+  {name:"DSP Focus Fund",house:"DSP",cat:"Focused",aum:5800,exp:0.82,r1y:12.5,r3y:21.5,r5y:23.5,sharpe:0.95,stdDev:16.8,rating:4},
+  {name:"Franklin India Focused Equity",house:"Franklin Templeton",cat:"Focused",aum:3200,exp:0.95,r1y:12.8,r3y:22.0,r5y:24.0,sharpe:0.98,stdDev:17.0,rating:4},
+  {name:"Canara Robeco Focused Equity",house:"Canara Robeco",cat:"Focused",aum:2800,exp:0.58,r1y:11.5,r3y:20.5,r5y:22.5,sharpe:0.91,stdDev:16.2,rating:4},
+  {name:"HDFC Focused 30 Fund",house:"HDFC",cat:"Focused",aum:8500,exp:0.75,r1y:13.2,r3y:22.5,r5y:24.2,sharpe:1.00,stdDev:17.2,rating:4},
+  {name:"Kotak Focused Equity Fund",house:"Kotak",cat:"Focused",aum:4500,exp:0.58,r1y:12.0,r3y:21.0,r5y:23.0,sharpe:0.94,stdDev:16.5,rating:4},
+  {name:"ABSL Focused Equity Fund",house:"Aditya Birla SL",cat:"Focused",aum:5200,exp:0.98,r1y:11.5,r3y:20.8,r5y:22.8,sharpe:0.92,stdDev:16.8,rating:3},
+  {name:"UTI Focused Fund",house:"UTI",cat:"Focused",aum:2500,exp:0.88,r1y:11.8,r3y:21.2,r5y:23.0,sharpe:0.94,stdDev:16.8,rating:4},
+  {name:"Quant Focused Fund",house:"Quant",cat:"Focused",aum:1200,exp:0.58,r1y:15.5,r3y:26.5,r5y:29.2,sharpe:1.15,stdDev:19.5,rating:5},
+  {name:"WhiteOak Capital Focused Fund",house:"WhiteOak Capital",cat:"Focused",aum:2800,exp:0.58,r1y:13.5,r3y:23.0,r5y:25.5,sharpe:1.02,stdDev:17.5,rating:4},
+  {name:"Axis Focused 25 Fund",house:"Axis",cat:"Focused",aum:14500,exp:0.58,r1y:8.2,r3y:14.5,r5y:16.5,sharpe:0.60,stdDev:14.5,rating:3},
+  {name:"Tata Focused Equity Fund",house:"Tata",cat:"Focused",aum:2200,exp:0.62,r1y:12.8,r3y:22.2,r5y:24.0,sharpe:0.98,stdDev:17.2,rating:4},
+  {name:"Motilal Oswal Focused Fund",house:"Motilal Oswal",cat:"Focused",aum:2500,exp:0.62,r1y:16.8,r3y:27.5,r5y:29.5,sharpe:1.18,stdDev:20.5,rating:5},
+  {name:"360 ONE Focused Equity Fund",house:"360 ONE",cat:"Focused",aum:4200,exp:0.65,r1y:13.8,r3y:23.5,r5y:25.8,sharpe:1.05,stdDev:18.0,rating:4},
 ];
 
-const CAT_COLORS={"Large Cap":"#378ADD","Mid Cap":"#EF9F27","Small Cap":"#D85A30","Flexi Cap":"#7F77DD","ELSS":"#1D9E75","Hybrid":"#5DCAA5","Index":"#888780","Sectoral":"#D4537E"};
-const CAT_BADGE={"Large Cap":"background:#E6F1FB;color:#0C447C","Mid Cap":"background:#FAEEDA;color:#633806","Small Cap":"background:#FAECE7;color:#712B13","Flexi Cap":"background:#EEEDFE;color:#3C3489","ELSS":"background:#EAF3DE;color:#27500A","Hybrid":"background:#E1F5EE;color:#085041","Index":"background:#F1EFE8;color:#444441","Sectoral":"background:#FBEAF0;color:#72243E"};
+const CAT_COLORS={
+  "Large Cap":"#378ADD","Mid Cap":"#EF9F27","Small Cap":"#D85A30",
+  "Flexi Cap":"#7F77DD","Multi Cap":"#C45BB5","Large & Mid Cap":"#2FA8A8",
+  "ELSS":"#1D9E75","Hybrid":"#5DCAA5","Index":"#888780",
+  "Sectoral":"#D4537E","Value/Contra":"#B47830","Focused":"#5A8A3C"
+};
+const CAT_BADGE={
+  "Large Cap":"background:#E6F1FB;color:#0C447C",
+  "Mid Cap":"background:#FAEEDA;color:#633806",
+  "Small Cap":"background:#FAECE7;color:#712B13",
+  "Flexi Cap":"background:#EEEDFE;color:#3C3489",
+  "Multi Cap":"background:#F9E6F6;color:#5C1D5A",
+  "Large & Mid Cap":"background:#E3F5F5;color:#0A4E4E",
+  "ELSS":"background:#EAF3DE;color:#27500A",
+  "Hybrid":"background:#E1F5EE;color:#085041",
+  "Index":"background:#F1EFE8;color:#444441",
+  "Sectoral":"background:#FBEAF0;color:#72243E",
+  "Value/Contra":"background:#F5ECD9;color:#5C3200",
+  "Focused":"background:#EBF4E3;color:#244813"
+};
 
 let activePeriod="r1y",sortCol="r1y",sortDir=-1,barChart=null,sctChart=null,filtered=[];
 
@@ -207,7 +483,7 @@ function updateTable(arr){
     const s="★".repeat(f.rating)+"☆".repeat(5-f.rating);
     tb.innerHTML+=`<tr>
       <td><div class="fn">${f.name}</div><div class="fh">${f.house}</div></td>
-      <td><span class="badge" style="${CAT_BADGE[f.cat]}">${f.cat}</span></td>
+      <td><span class="badge" style="${CAT_BADGE[f.cat]||''}">${f.cat}</span></td>
       <td class="${f.r1y>=0?"pos":"neg"}">${f.r1y.toFixed(1)}</td>
       <td class="${f.r3y>=0?"pos":"neg"}">${f.r3y.toFixed(1)}</td>
       <td class="${f.r5y>=0?"pos":"neg"}">${f.r5y.toFixed(1)}</td>
@@ -245,7 +521,7 @@ function updateScatterChart(arr){
   const cats=[...new Set(arr.map(f=>f.cat))];
   const datasets=cats.map(cat=>{
     const pts=arr.filter(f=>f.cat===cat).map(f=>({x:parseFloat(f.stdDev.toFixed(1)),y:parseFloat(f.r3y.toFixed(1)),label:f.name}));
-    return{label:cat,data:pts,backgroundColor:CAT_COLORS[cat]||"#888",pointRadius:5,pointHoverRadius:7};
+    return{label:cat,data:pts,backgroundColor:CAT_COLORS[cat]||"#888",pointRadius:4,pointHoverRadius:6};
   });
   if(sctChart)sctChart.destroy();
   sctChart=new Chart(document.getElementById("sct-chart"),{
@@ -269,7 +545,7 @@ function render(){
   updateTable(filtered);
   updateBarChart(filtered);
   updateScatterChart(filtered);
-  document.getElementById("rinfo").textContent=`Showing ${filtered.length} fund${filtered.length!==1?"s":""}`;
+  document.getElementById("rinfo").textContent=`Showing ${filtered.length} fund${filtered.length!==1?"s":""} of ${FUNDS.length} total`;
 }
 
 document.querySelectorAll(".pbtn").forEach(btn=>{
@@ -284,6 +560,7 @@ document.getElementById("f-minr").addEventListener("input",function(){document.g
 document.getElementById("f-maxe").addEventListener("input",function(){document.getElementById("sl2-lbl").textContent=parseFloat(this.value).toFixed(1)+"%";render();});
 ["f-cat","f-house","f-sort"].forEach(id=>document.getElementById(id).addEventListener("change",render));
 
+// Populate fund houses
 const houses=[...new Set(FUNDS.map(f=>f.house))].sort();
 const hsel=document.getElementById("f-house");
 houses.forEach(h=>{const o=document.createElement("option");o.textContent=h;hsel.appendChild(o);});
@@ -296,29 +573,6 @@ document.querySelectorAll("th[data-col]").forEach(th=>{
     render();
   });
 });
-
-async function runAI(){
-  const btn=document.getElementById("ai-btn");
-  const out=document.getElementById("ai-out");
-  if(!filtered.length){out.innerHTML='<div class="ai-ph">No funds to analyse. Try adjusting your filters.</div>';return;}
-  btn.disabled=true;btn.textContent="Analysing...";
-  out.innerHTML='<div class="ai-ph">Analysing your selection with Claude AI...</div>';
-  const fundsText=filtered.slice(0,25).map(f=>`${f.name} (${f.cat}, ${f.house}) | 1Y:${f.r1y}% 3Y:${f.r3y}% 5Y:${f.r5y}% | Sharpe:${f.sharpe} StdDev:${f.stdDev}% Exp:${f.exp}% AUM:Rs.${f.aum}Cr`).join("\n");
-  const prompt=`You are a mutual fund analyst for Indian markets. Here are ${filtered.length} funds from the screener:\n\n${fundsText}\n\nProvide concise, specific insights:\n1. Top 3 by risk-adjusted return and why\n2. Best value picks (strong returns + low cost)\n3. Category/trend observation\n4. Any red flags (high cost, poor risk-return)\n5. One-line summary for: conservative investor, moderate investor, aggressive investor\n\nBe sharp and specific. Use bullet points. No generic disclaimers.`;
-  try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})
-    });
-    const data=await res.json();
-    const text=data.content?.[0]?.text||"No response received.";
-    out.innerHTML=text.replace(/\n/g,"<br>").replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>");
-  }catch(e){
-    out.innerHTML='<div class="ai-ph">Error contacting AI. Please try again.</div>';
-  }
-  btn.disabled=false;btn.textContent="Analyse filtered funds";
-}
 
 render();
 </script>
